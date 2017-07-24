@@ -1,0 +1,12 @@
+        <!-- Стандарты: [query max="4" type="post" status="publish" order="DESC" container="container-fluid" columns="4" template="#post_type"]<br> -->
+
+          columns="4", | 1 | 2 | 3 | 4 | 10 | 12 <br>
+          template=string определенный шаблон ищется так (если шаблон не найден, будет использоваться последующий):<br><pre>
+          #theme/template-parts/content-#template-query.php
+          #theme/template-parts/content-#template.php
+          #theme/template-parts/content-query.php
+          #theme/template-parts/content.php</pre>',
+        ),
+      );
+
+    $this->register_section('dp-queries', 'Запросы', '', $args);
