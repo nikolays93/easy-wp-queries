@@ -33,12 +33,14 @@
 					if(e.data.max && e.data.max != "-1") args.attrs.max = e.data.max;
 					if(e.data.status && e.data.status != 'public') args.attrs.status = e.data.status;
 					if(e.data.order && e.data.order != 'desc') args.attrs.order = e.data.order;
-					if(e.data.cat) args.attrs.cat = e.data.cat;
-					if(e.data.slug) args.attrs.slug = e.data.slug;
+					// if(e.data.cat) args.attrs.cat = e.data.cat;
+					// if(e.data.slug) args.attrs.slug = e.data.slug;
 					if(e.data.parent) args.attrs.parent = e.data.parent;
 					if(e.data.wrap_tag) args.attrs.wrap_tag = e.data.wrap_tag;
 					if(e.data.tax) args.attrs.tax = e.data.tax;
 					if(e.data.terms) args.attrs.terms = e.data.terms;
+
+					if(e.data.template) args.attrs.template = e.data.template;
 
 					editor.insertContent( wp.shortcode.string( args ) );
 				};
@@ -51,72 +53,84 @@
 					value : queryMCEVar.postTypes[i]
 				});
 			}
-			
+
 			editor.windowManager.open( {
 				title: 'Simple WordPress Query',
 				body: [
 					{
-						type: 'textbox',
-						name: 'id',
-						label: 'Posts ID',
+						type       : 'textbox',
+						name       : 'id',
+						label      : 'Posts ID',
 						placeholder: '8,10,32',
-						value: values.id
+						value      : values.id
 					},
 					{
-						type: 'textbox',
+						type   : 'textbox',
 						subtype: 'number',
-						name: 'max',
-						label: 'Max Posts',
+						name   : 'max',
+						label  : 'Max Posts',
 						// placeholder: '5',
-						value: values.max ? values.max : -1
+						value  : values.max || -1
 					},
 					{
-						type: 'listbox',
-						name: 'type',
-						label: 'Post Type',
+						type  : 'listbox',
+						name  : 'type',
+						label : 'Post Type',
 						values: postTypes,
-						value: values.type
+						value : values.type
 					},
+					// {
+					// 	type: 'textbox',
+					// 	name: 'cat',
+					// 	label: 'Categories ID (for post)',
+					// 	placeholder: '6,12,18',
+					// 	value: values.cat
+					// },
+					// {
+					// 	type: 'textbox',
+					// 	name: 'slug',
+					// 	label: 'Category SLUG (for post)',
+					// 	placeholder : 'articles',
+					// 	value: values.slug
+					// },
 					{
-						type: 'textbox',
-						name: 'cat',
-						label: 'Categories ID (for post)',
-						placeholder: '6,12,18',
-						value: values.cat
-					},
-					{
-						type: 'textbox',
-						name: 'slug',
-						label: 'Category SLUG (for post)',
-						placeholder : 'articles',
-						value: values.slug
-					},
-					{
-						type: 'textbox',
-						name: 'parent',
+						type : 'textbox',
+						name : 'parent',
 						label: 'Parent (for hierarchy)',
 						value: values.parent
 					},
 					{
-						type: 'listbox',
-						name: 'status',
-						label: 'Post Status',
+						type  : 'listbox',
+						name  : 'status',
+						label : 'Post Status',
 						values: [
 							{text: 'Public', value: 'public'},
 							{text: 'Future', value: 'future'},
 							{text: 'Any', value: 'any'}
 						],
-						value: values.status
+						value : values.status
 					},
 					{
-						type: 'listbox',
-						name: 'order',
-						label: 'Order',
+						type  : 'listbox',
+						name  : 'order',
+						label : 'Order',
 						values: [
 							{text: 'DESC', value: 'desc'},
 							{text: 'ASC', value: 'asc'},
 						],
-						value: values.order
+						value : values.order
+					},
+					{
+						type : 'textbox',
+						name : 'tax',
+						label: 'Taxanomy',
+						value: values.tax
+					},
+					{
+						type : 'textbox',
+						name : 'terms',
+						label: 'Terms of tax',
+						value: values.terms
 					},
 					{
 						type: 'textbox',
@@ -133,20 +147,18 @@
 						value: values.innercontent
 					},
 					{
-						type: 'textbox',
-						name: 'tax',
-						label: 'Taxanomy',
-						value: values.tax
+						type   : 'textbox',
+						subtype: 'number',
+						name   : 'columns',
+						label  : 'Columns',
+						value  : values.columns || 4
 					},
 					{
-						type: 'textbox',
-						name: 'terms',
-						label: 'Terms of tax',
-						value: values.terms
+						type   : 'textbox',
+						name   : 'template',
+						label  : 'Custom Template',
+						value  : values.template
 					},
-					// columns
-					// template
-					
 				],
 				onsubmit: onsubmit_callback
 			} );
