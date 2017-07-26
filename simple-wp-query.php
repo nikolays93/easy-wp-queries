@@ -1,7 +1,7 @@
 <?php
 
 /*
-Plugin Name: Simple WP_Query (widget && shortcode extended)
+Plugin Name: Simple WordPress Queries Shortcode
 Description: 
 Plugin URI: http://#
 Version: 1.0 alpha

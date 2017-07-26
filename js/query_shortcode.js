@@ -25,33 +25,20 @@
 					// Insert content when the window form is submitted (this also replaces during edit, handy!)
 					var args = {
 							tag     : shortcode_string,
-							// type    : e.data.innercontent.length ? 'closed' : 'single',
-							// content : e.data.innercontent,
-							attrs : {
-								max     : e.data.max,
-								type : e.data.type,
-							}
+							attrs : { type : e.data.type }
 						};
-					if(e.data.id)
-						args.attrs.id = e.data.id;
-					if(e.data.status && e.data.status != 'public')
-						args.attrs.status = e.data.status;
-					if(e.data.order && e.data.order != 'desc')
-						args.attrs.order = e.data.order;
-					if(e.data.cat)
-						args.attrs.cat = e.data.cat;
-					if(e.data.slug)
-						args.attrs.slug = e.data.slug;
-					if(e.data.parent)
-						args.attrs.parent = e.data.parent;
-					if(e.data.wrap_tag)
-						args.attrs.wrap_tag = e.data.wrap_tag;
-					if(e.data.container)
-						args.attrs.container = e.data.container;
-					if(e.data.tax)
-						args.attrs.tax = e.data.tax;
-					if(e.data.terms)
-						args.attrs.terms = e.data.terms;
+
+					// defaults
+					if(e.data.id) args.attrs.id = e.data.id;
+					if(e.data.max && e.data.max != "-1") args.attrs.max = e.data.max;
+					if(e.data.status && e.data.status != 'public') args.attrs.status = e.data.status;
+					if(e.data.order && e.data.order != 'desc') args.attrs.order = e.data.order;
+					if(e.data.cat) args.attrs.cat = e.data.cat;
+					if(e.data.slug) args.attrs.slug = e.data.slug;
+					if(e.data.parent) args.attrs.parent = e.data.parent;
+					if(e.data.wrap_tag) args.attrs.wrap_tag = e.data.wrap_tag;
+					if(e.data.tax) args.attrs.tax = e.data.tax;
+					if(e.data.terms) args.attrs.terms = e.data.terms;
 
 					editor.insertContent( wp.shortcode.string( args ) );
 				};
@@ -80,8 +67,8 @@
 						subtype: 'number',
 						name: 'max',
 						label: 'Max Posts',
-						placeholder: '5',
-						value: values.max
+						// placeholder: '5',
+						value: values.max ? values.max : -1
 					},
 					{
 						type: 'listbox',
