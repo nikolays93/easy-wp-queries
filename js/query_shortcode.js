@@ -56,6 +56,15 @@
 					editor.insertContent( wp.shortcode.string( args ) );
 				};
 			}
+
+			var postTypes = [];
+			for (var i = 0; i < queryMCEVar.postTypes.length; i++) {
+				postTypes.push({
+					text  : queryMCEVar.postTypes[i],
+					value : queryMCEVar.postTypes[i]
+				});
+			}
+			
 			editor.windowManager.open( {
 				title: 'Simple WordPress Query',
 				body: [
@@ -78,11 +87,7 @@
 						type: 'listbox',
 						name: 'type',
 						label: 'Post Type',
-						values: [
-							{text: 'Post', value: 'post'},
-							{text: 'Page', value: 'page'},
-							{text: 'Product', value: 'product'}
-						],
+						values: postTypes,
 						value: values.type
 					},
 					{
@@ -121,7 +126,7 @@
 						name: 'order',
 						label: 'Order',
 						values: [
-							{text: 'DESC', value: 'desc'}
+							{text: 'DESC', value: 'desc'},
 							{text: 'ASC', value: 'asc'},
 						],
 						value: values.order

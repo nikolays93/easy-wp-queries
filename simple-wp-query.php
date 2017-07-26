@@ -43,10 +43,36 @@ class SimpleWPQuery_Plugin {
 		/** MCE Editor */
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') )
 			return;
-		
+
+		foreach ( array('post.php','post-new.php') as $hook ) {
+			add_action( "admin_head-$hook", array($this, 'mce_variables') );
+		}
+
 		add_action( 'admin_head', array( $this, 'add_mce_script' ) );
 		add_filter("mce_external_plugins", array($this, 'mce_plugin'));
 		add_filter("mce_buttons", array($this, 'mce_button'));
+	}
+
+	function mce_variables() {
+		$ptypes = get_post_types( array('public' => true) );
+		
+		?>
+		<script type='text/javascript'>
+			var queryMCEVar = {
+				'postTypes': [<?php
+				$i = 0;
+				foreach ($ptypes as $type) {
+					if($i == 0){
+						echo "'{$type}'";
+						$i++;
+						continue;
+					}
+					echo ",'{$type}'";
+				}
+				?>],
+			};
+		</script>
+		<?php
 	}
 
 	/** Register Shortcode Button MCE */
