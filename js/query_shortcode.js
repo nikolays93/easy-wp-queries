@@ -40,6 +40,7 @@
 					// if(e.data.slug) args.attrs.slug = e.data.slug;
 					if(e.data.parent) args.attrs.parent = e.data.parent;
 					if(e.data.wrap_tag) args.attrs.wrap_tag = e.data.wrap_tag;
+					if(e.data.container) args.attrs.container = e.data.container;
 					if(e.data.tax) args.attrs.tax = e.data.tax;
 					if(e.data.terms) args.attrs.terms = e.data.terms;
 

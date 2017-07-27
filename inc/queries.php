@@ -5,7 +5,7 @@ class SimpleWPQuery {
   function __construct(){
     add_shortcode('query', array($this, 'queries'));
   }
-  
+
   function get_top_sales_args($type, $max, $order, $view_type=false){
     switch ($view_type) {
       case 'personal':
@@ -150,7 +150,7 @@ class SimpleWPQuery {
 
     if(!$template)
         $template = ($type != 'post') ? $type : '';
-    
+
     $query = new WP_Query($args);
 
     if( $max > 1 )
@@ -158,14 +158,14 @@ class SimpleWPQuery {
 
     if($type != 'page')
       $this->set_query_variables('is_page', '');
-    
+
     // шаблон
     ob_start();
     if ( $query->have_posts() ) {
       echo $this->get_container('start', $container, $wrap_tag);
       while ( $query->have_posts() ) {
         $query->the_post();
-        
+
         $this->get_query_template('template-parts/content', $template, array(
           'columns' => $columns,
           ));

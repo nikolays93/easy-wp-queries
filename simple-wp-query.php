@@ -2,7 +2,7 @@
 
 /*
 Plugin Name: Simple WordPress Queries Shortcode
-Description: 
+Description:
 Plugin URI: http://#
 Version: 1.0 alpha
 Author: NikolayS93
@@ -55,7 +55,7 @@ class SimpleWPQuery_Plugin {
 
 	function mce_variables() {
 		$ptypes = get_post_types( array('public' => true) );
-		
+
 		?>
 		<script type='text/javascript'>
 			var queryMCEVar = {
