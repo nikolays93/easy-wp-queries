@@ -24,9 +24,12 @@
 				onsubmit_callback = function( e ) {
 					// Insert content when the window form is submitted (this also replaces during edit, handy!)
 					var args = {
-							tag     : shortcode_string,
-							attrs : { type : e.data.type }
-						};
+						tag     : shortcode_string,
+						attrs : {
+							type    : e.data.type,
+							columns : e.data.columns
+						}
+					};
 
 					// defaults
 					if(e.data.id) args.attrs.id = e.data.id;
