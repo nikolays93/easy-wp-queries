@@ -58,7 +58,17 @@ class SimpleWPQuery {
     $templates[] = $template.'-query.php';
     $templates[] = $template.'.php';
 
-    require locate_template($templates);
+    if($req = locate_template($templates)){
+      require $req;
+      return;
+    }
+
+    if( ! is_admin() && defined('WP_DEBUG_DISPLAY') && WP_DEBUG_DISPLAY){
+      echo "<pre>";
+      echo "Шаблон не найден по адресу: <br>" . get_template_directory() . '/<br>';
+      print_r($templates);
+      echo "</pre>";
+    }
   }
   function get_container($part=false, $class = 'container-fluid', $tag = 'div'){
     $result = "";
@@ -166,7 +176,11 @@ class SimpleWPQuery {
       while ( $query->have_posts() ) {
         $query->the_post();
 
-        $this->get_query_template('template-parts/content', $template, array(
+        $options = get_option( SimpleWPQuery_Plugin::SETTINGS_NAME );
+        $tempalte_dir = ( isset($options['template_dir']) ) ? $options['template_dir'] : 'template-parts';
+
+        $this->get_query_template($tempalte_dir.'/content', $template, array(
+          'query'   => $args,
           'columns' => $columns,
           ));
       }

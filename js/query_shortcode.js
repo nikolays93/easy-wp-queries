@@ -7,8 +7,8 @@
 		// template: media.template( 'editor-boutique-banner' ),
 		getContent: function() {
 		// Контент внутри объекта
-			var options = this.shortcode.attrs.named;
-			options.innercontent = this.shortcode.content;
+			// var options = this.shortcode.attrs.named;
+			// options.innercontent = this.shortcode.content;
 			// return this.template(options);
 			return '<p style="text-align: center;">{SimpleWPQuery}</p>';
 		},
@@ -22,14 +22,11 @@
 			values = values || [];
 			if(typeof onsubmit_callback !== 'function'){
 				onsubmit_callback = function( e ) {
-					// Insert content when the window form is submitted (this also replaces during edit, handy!)
+					// Insert content when the window form is submitted
 					var args = {
-						tag     : shortcode_string,
-						attrs : {
-							type    : e.data.type,
-							columns : e.data.columns
-						}
-					};
+							tag     : shortcode_string,
+							attrs : { type : e.data.type }
+						};
 
 					// defaults
 					if(e.data.id) args.attrs.id = e.data.id;
@@ -40,7 +37,6 @@
 					// if(e.data.slug) args.attrs.slug = e.data.slug;
 					if(e.data.parent) args.attrs.parent = e.data.parent;
 					if(e.data.wrap_tag) args.attrs.wrap_tag = e.data.wrap_tag;
-					if(e.data.container) args.attrs.container = e.data.container;
 					if(e.data.tax) args.attrs.tax = e.data.tax;
 					if(e.data.terms) args.attrs.terms = e.data.terms;
 
@@ -48,14 +44,6 @@
 
 					editor.insertContent( wp.shortcode.string( args ) );
 				};
-			}
-
-			var postTypes = [];
-			for (var i = 0; i < queryMCEVar.postTypes.length; i++) {
-				postTypes.push({
-					text  : queryMCEVar.postTypes[i],
-					value : queryMCEVar.postTypes[i]
-				});
 			}
 
 			editor.windowManager.open( {
@@ -80,7 +68,7 @@
 						type  : 'listbox',
 						name  : 'type',
 						label : 'Post Type',
-						values: postTypes,
+						values: queryMCEVar.postTypes,
 						value : values.type
 					},
 					// {
@@ -165,6 +153,40 @@
 					},
 				],
 				onsubmit: onsubmit_callback
+			} );
+		},
+		popupsettings: function(editor, values, onsubmit_callback){
+			if(typeof onsubmit_callback !== 'function'){
+				onsubmit_settings = function( e ) {
+					if( e.data.template_dir == queryMCEVar.template )
+						return;
+
+					wp.ajax.send( "update_squery_settings", {
+						success: function(data){
+							queryMCEVar.template = e.data.template_dir;
+							editor.windowManager.alert('Настройки успешно сохранены. Теперь шаблон будет доступен по адресу: \r\n [active_theme]/' + queryMCEVar.template + '/content-[post_type|custom_tpl]-query.php');
+						},
+						error: function(data){
+							editor.windowManager.alert( data || 'Unregistred error!' );
+						},
+						data: {
+							security: queryMCEVar.security,
+							template_dir: e.data.template_dir
+						}
+					});
+				};
+			}
+
+			editor.windowManager.open( {
+				title: 'Simple WordPress Query',
+				body: [{
+					type   : 'textbox',
+					name   : 'template_dir',
+					label  : 'Templates DIR',
+					placeholder: 'template-parts',
+					value: queryMCEVar.template
+				}],
+				onsubmit: onsubmit_settings
 			} );
 		}
 	};

@@ -2,9 +2,9 @@
 
 /*
 Plugin Name: Simple WordPress Queries Shortcode
-Description:
+Description: Add Query shortcode
 Plugin URI: http://#
-Version: 1.0 alpha
+Version: 1.1 alpha
 Author: NikolayS93
 Author URI: https://vk.com/nikolays_93
 Author EMAIL: nikolayS93@ya.ru
@@ -16,10 +16,13 @@ if ( ! defined( 'ABSPATH' ) )
 	exit;
 
 class SimpleWPQuery_Plugin {
-	private function __construct() {}
+	const SETTINGS_NAME = 'SWPQ';
+
 	private function __clone() {}
 	private function __wakeup() {}
-
+	private function __construct() {
+		self::define_constants();
+	}
 	private static $instance = null;
 	public static function get_instance() {
 		if ( ! isset( self::$instance ) )
@@ -29,8 +32,6 @@ class SimpleWPQuery_Plugin {
 	}
 
 	public function init(){
-		self::define_constants();
-
 		add_action( 'admin_init', array( $this, 'init_plugin' ), 20 );
 		require SQUERY_DIR . '/inc/queries.php';
 	}
@@ -44,35 +45,34 @@ class SimpleWPQuery_Plugin {
 		if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') )
 			return;
 
-		foreach ( array('post.php','post-new.php') as $hook ) {
-			add_action( "admin_head-$hook", array($this, 'mce_variables') );
-		}
+		add_action('wp_ajax_update_squery_settings', array($this, 'ajax_update_settings'));
+
+		// foreach ( array('post.php','post-new.php') as $hook ) {
+		// 	add_action( "admin_head-$hook", array($this, 'mce_variables') );
+		// }
 
 		add_action( 'admin_head', array( $this, 'add_mce_script' ) );
 		add_filter("mce_external_plugins", array($this, 'mce_plugin'));
 		add_filter("mce_buttons", array($this, 'mce_button'));
 	}
 
-	function mce_variables() {
-		$ptypes = get_post_types( array('public' => true) );
+	function ajax_update_settings() {
+		if( ! wp_verify_nonce( $_POST['security'], __CLASS__ ) )
+			wp_die('Ошибка! нарушены правила безопасности');
 
-		?>
-		<script type='text/javascript'>
-			var queryMCEVar = {
-				'postTypes': [<?php
-				$i = 0;
-				foreach ($ptypes as $type) {
-					if($i == 0){
-						echo "'{$type}'";
-						$i++;
-						continue;
-					}
-					echo ",'{$type}'";
-				}
-				?>],
-			};
-		</script>
-		<?php
+		if( ! isset($_POST['template_dir']) )
+			wp_die('Данные не переданны');
+
+		$dir = get_template_directory() . '/' . sanitize_text_field( $_POST['template_dir'] );
+		if( !is_dir($dir) )
+			wp_die('Нет доступа к указаной папке в активной теме (' . $dir . ')');
+
+
+		$update = update_option( self::SETTINGS_NAME, array('template_dir' => $_POST['template_dir']) );
+		if( $update )
+			echo "1";
+
+		wp_die();
 	}
 
 	/** Register Shortcode Button MCE */
@@ -89,6 +89,25 @@ class SimpleWPQuery_Plugin {
 			return;
 
 		wp_enqueue_script( 'query-sc', plugins_url( 'js/query_shortcode.js', __FILE__ ), array( 'shortcode', 'wp-util', 'jquery' ), false, true );
+
+		$options = get_option( self::SETTINGS_NAME );
+		$post_types = get_post_types( array('public' => true) );
+		$types = array();
+		foreach ($post_types as $value => $text) {
+			$types[] = array('value' => $value, 'text' => $text);
+		}
+		wp_localize_script('query-sc', 'queryMCEVar',
+			array(
+				'postTypes' => $types,
+				'security' => wp_create_nonce( __CLASS__ ),
+				'template' => isset($options['template_dir']) ? $options['template_dir'] : '',
+				)
+			);
 	}
+	static public function activate(){ add_option( self::SETTINGS_NAME, array('template_dir' => '') ); }
+	static public function uninstall(){ delete_option( self::SETTINGS_NAME ); }
 }
+
 add_action( 'plugins_loaded', function(){ SimpleWPQuery_Plugin::get_instance()->init(); });
+register_activation_hook( __FILE__, array( 'SimpleWPQuery_Plugin', 'activate' ) );
+register_uninstall_hook( __FILE__, array( 'SimpleWPQuery_Plugin', 'uninstall' ) );
