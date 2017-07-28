@@ -100,6 +100,7 @@ class SimpleWPQuery {
       'parent' => '',
       'status' => 'publish', // publish, future, alltime (publish+future) //
       'order' => 'DESC', // ASC || DESC
+      'orderby' => 'date',
       'wrap_tag' => 'div',
       'container' => 'container-fluid', //true=container, false=noDivContainer, string=custom container
       'tax' => false,
@@ -131,7 +132,8 @@ class SimpleWPQuery {
       'posts_per_page' => $max,
       'category_name'=> $slug,
       'post_parent__in' => $parent,
-      'order'=> $order,
+      'order' => $order,
+      'orderby' => $orderby,
       'post_status' => $status,
       );
 
