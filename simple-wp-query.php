@@ -94,7 +94,7 @@ class SimpleWPQuery_Plugin {
 		$post_types = get_post_types( array('public' => true) );
 		$types = array();
 		foreach ($post_types as $value => $text) {
-			$types[] = array('value' => $value, 'text' => $text);
+			$types[] = (object) array('value' => $value, 'text' => $text);
 		}
 		wp_localize_script('query-sc', 'queryMCEVar',
 			array(

@@ -25,12 +25,16 @@
 					// Insert content when the window form is submitted
 					var args = {
 							tag     : shortcode_string,
-							attrs : { type : e.data.type }
+							attrs : {
+								type : e.data.type,
+								columns : e.data.columns,
+								max : e.data.max
+							}
 						};
 
 					// defaults
 					if(e.data.id) args.attrs.id = e.data.id;
-					if(e.data.max && e.data.max != "-1") args.attrs.max = e.data.max;
+					// if(e.data.max && e.data.max != "-1") args.attrs.max = e.data.max;
 					if(e.data.status && e.data.status != 'public') args.attrs.status = e.data.status;
 					if(e.data.order && e.data.order != 'desc') args.attrs.order = e.data.order;
 					// if(e.data.cat) args.attrs.cat = e.data.cat;
