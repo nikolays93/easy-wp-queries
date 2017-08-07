@@ -37,6 +37,7 @@
 					// if(e.data.max && e.data.max != "-1") args.attrs.max = e.data.max;
 					if(e.data.status && e.data.status != 'public') args.attrs.status = e.data.status;
 					if(e.data.order && e.data.order != 'desc') args.attrs.order = e.data.order;
+					if(e.data.orderby && e.data.orderby != 'data') args.attrs.orderby = e.data.orderby;
 					// if(e.data.cat) args.attrs.cat = e.data.cat;
 					// if(e.data.slug) args.attrs.slug = e.data.slug;
 					if(e.data.parent) args.attrs.parent = e.data.parent;
@@ -105,6 +106,32 @@
 							{text: 'Any', value: 'any'}
 						],
 						value : values.status
+					},
+					{
+						type  : 'listbox',
+						name  : 'orderby',
+						label : 'Order By',
+						values: [
+							{text: 'None', value: 'none'},
+							{text: 'ID', value: 'ID'},
+							{text: 'Author', value: 'author'},
+							{text: 'Title', value: 'title'},
+							{text: 'Name', value: 'name'},
+							{text: 'Type', value: 'type'},
+							{text: 'Date', value: 'date'},
+							{text: 'Modified', value: 'modified'},
+							{text: 'Parent', value: 'parent'},
+							{text: 'Rand', value: 'rand'},
+							{text: 'Comment_count', value: 'comment_count'},
+							{text: 'Relevance', value: 'relevance'},
+							{text: 'Menu_order', value: 'menu_order'},
+							// {text: 'meta_value', value: 'meta_value'},
+							// {text: 'meta_value_num', value: 'meta_value_num'},
+							// {text: 'post__in', value: 'post__in'},
+							// {text: 'post_name__in', value: 'post_name__in'},
+							// {text: 'post_parent__in', value: 'post_parent__in'}
+						],
+						value : values.orderby || 'date'
 					},
 					{
 						type  : 'listbox',
