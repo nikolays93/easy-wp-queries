@@ -100,7 +100,7 @@ class SimpleWPQuery {
       'parent' => '',
       'status' => 'publish', // publish, future, alltime (publish+future) //
       'order' => 'DESC', // ASC || DESC
-      'orderby' => 'date',
+      'orderby' => 'menu_order date',
       'wrap_tag' => 'div',
       'container' => 'container-fluid', //true=container, false=noDivContainer, string=custom container
       'tax' => false,
