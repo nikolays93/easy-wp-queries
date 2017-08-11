@@ -25,6 +25,7 @@
 					// Insert content when the window form is submitted
 					var args = {
 							tag     : shortcode_string,
+							type    : 'single',
 							attrs : {
 								type : e.data.type,
 								columns : e.data.columns,
