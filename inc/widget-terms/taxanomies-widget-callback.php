@@ -1,5 +1,5 @@
 <?php
-	namespace TaxWidget;
+	namespace SQUERY\Widget_Terms;
 ?>
 <div class="widgin-widget-form">
 
@@ -29,7 +29,7 @@
 					<?php _e( 'Order By:', 'advanced-categories-widget' ); ?>
 				</label>
 				<select name="<?php echo $this->get_field_name('orderby'); ?>" id="<?php echo $this->get_field_id('orderby'); ?>" class="widefat">
-					<?php foreach( _orderby_list() as $query_var => $label  ) { ?>
+					<?php foreach( _orderby_term_list() as $query_var => $label  ) { ?>
 					<option value="<?php echo esc_attr( $query_var ); ?>" <?php selected( $instance['orderby'] , $query_var ); ?>><?php echo esc_html( $label ); ?></option>
 					<?php } ?>
 				</select>
@@ -176,11 +176,10 @@
 
 				<p>
 					<?php _e( 'Preview:', 'advanced-categories-widget' ); ?><br />
-
 					<span class="widgin-preview-container">
 						<span class="widgin-excerpt-preview">
-							<span class="widgin-excerpt"><?php echo wp_trim_words( sample_excerpt_term_description(), 15, '&hellip;' ); ?></span>
-							<span class="widgin-excerpt-sample" aria-hidden="true" role="presentation"><?php echo sample_excerpt_term_description(); ?></span>
+							<span class="widgin-excerpt"><?php echo wp_trim_words( _excerpt_sample(), 15, '&hellip;' ); ?></span>
+							<span class="widgin-excerpt-sample" aria-hidden="true" role="presentation"><?php echo _excerpt_sample() ?></span>
 						</span>
 					</span>
 				</p>

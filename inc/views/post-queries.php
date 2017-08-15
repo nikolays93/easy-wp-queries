@@ -178,7 +178,7 @@ class SimpleWPQuery {
       while ( $query->have_posts() ) {
         $query->the_post();
 
-        $options = get_option( SimpleWPQuery_Plugin::SETTINGS_NAME );
+        $options = get_option( EasyWPQueries::SETTINGS_NAME );
         $tempalte_dir = ( isset($options['template_dir']) ) ? $options['template_dir'] : 'template-parts';
 
         $this->get_query_template($tempalte_dir.'/content', $template, array(

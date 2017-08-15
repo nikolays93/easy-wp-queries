@@ -1,27 +1,26 @@
 <?php
 
-namespace TaxWidget;
+namespace SQUERY\Widget_Terms;
 
 if ( ! defined( 'ABSPATH' ) )
   exit; // disable direct access
 
-class TaxanomiesWidget extends \WP_Widget
+class Widget extends \WP_Widget
 {
-
 	public function __construct(){
 		$widget_options = array(
-			'classname'                   => 'widget_acw_advanced_categories advanced-categories-widget',
-			'description'                 => __( 'A categories widget with extended features.' ),
+			'classname'                   => 'easy-queries easy-queries-term-widget',
+			'description'                 => __( 'A terms list widget.' ),
 			'customize_selective_refresh' => true,
 			);
 
 		$control_options = array();
 
 		parent::__construct(
-			'advanced-categories-widget', // $this->id_base
-			__( 'Advanced Taxanomies' ),  // $this->name
-			$widget_options,              // $this->widget_options
-			$control_options              // $this->control_options
+			'easy-queries-term-widget',        // $this->id_base
+			__( 'Easy Queries Terms Widget' ), // $this->name
+			$widget_options,                   // $this->widget_options
+			$control_options                   // $this->control_options
 		);
 
 		$this->alt_option_name = 'widget_acw_advanced_categories';
@@ -54,9 +53,9 @@ class TaxanomiesWidget extends \WP_Widget
 		$is_hierarchical           = $instance['hierarchy'];
 
 		if( $is_hierarchical )
-			$categories = get_widget_categories_hierarchy( $instance, $this );
+			$categories = get_terms_hierarchy( $instance, $this );
 		else
-			$categories = get_widget_categories( $instance, $this );
+			$categories = get_terms( $instance, $this );
 
 		// widget title
 		$_title = sizeof($categories >= 1) ? apply_filters( 'widget_title', $instance['title'], $instance, $this->id_base ) : '';
@@ -176,7 +175,6 @@ class TaxanomiesWidget extends \WP_Widget
 	public function form( $instance ){
 		$instance = wp_parse_args( (array) $instance, widget_defaults() );
 
-		include( get_plugin_sub_path('inc', 'taxanomies-widget-callback.php') );
+		include SQUERY_DIR . '/' . 'inc/widget-terms' . '/' . 'taxanomies-widget-callback.php';
 	}
-
 }

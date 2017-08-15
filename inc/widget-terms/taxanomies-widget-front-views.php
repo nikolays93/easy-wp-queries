@@ -1,5 +1,5 @@
 <?php
-namespace TaxWidget;
+namespace SQUERY\Widget_Terms;
 
 function get_item_id( $term = 0, $instance = array() ){
 	if( ! instance_of($term, 'WP_Term') )

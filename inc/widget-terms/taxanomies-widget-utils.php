@@ -1,49 +1,8 @@
 <?php
-namespace TaxWidget;
+namespace SQUERY\Widget_Terms;
 
 if ( ! defined( 'ABSPATH' ) )
   exit; // disable direct access
-
-function object_to_array_recursive($obj) {
-	if(is_object($obj)) $obj = (array) $obj;
-	if(is_array($obj)) {
-		$new = array();
-		foreach($obj as $key => $val) {
-			$new[$key] = object_to_array_recursive($val);
-		}
-	}
-	else $new = $obj;
-	return $new;
-}
-
-function sanitize_select_array( $options, $sort = true ){
-		$options = ( ! is_array( $options ) ) ? (array) $options : $options ;
-
-		// Clean the values (since it can be filtered by other plugins)
-		$options = array_map( 'esc_html', $options );
-
-		// Flip to clean the keys (used as <option> values in <select> field on form)
-		$options = array_flip( $options );
-		$options = array_map( 'sanitize_key', $options );
-
-		// Flip back
-		$options = array_flip( $options );
-
-		if( $sort ) {
-			asort( $options );
-		};
-
-		return $options;
-}
-
-function get_plugin_sub_path( $directory, $file = null ){
-	if( ! $directory )
-		return false;
-
-	$sub_path = T_WIDGET_DIR . trailingslashit( $directory ) . $file;
-
-	return $sub_path;
-}
 
 function widget_defaults(){
 	$_defaults = array(
@@ -90,16 +49,13 @@ function fieldset_header_html( $fieldset = 'general', $title = 'General Settings
 	return $field;
 }
 
-function sample_excerpt_term_description(){
-	$description = __( 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi consequatur quibusdam deserunt sapiente eum repellat amet vel et officiis? Laboriosam optio debitis, laborum provident accusamus est harum dignissimos quos officia? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi consequatur quibusdam deserunt sapiente eum repellat amet vel et officiis? Laboriosam optio debitis, laborum provident accusamus est harum dignissimos quos officia? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi consequatur quibusdam deserunt sapiente eum repellat amet vel et officiis? Laboriosam optio debitis, laborum provident accusamus est harum dignissimos quos officia?');
-
-	return $description;
-}
-
 function is_woocommerce_thumb_meta_field( $field, $term, $instance ){
 	if( function_exists('is_woocommerce') && $instance['tax'] == 'product_cat' || $instance['tax'] == 'product_tag'){
 		return get_term_meta( $term->term_id, 'thumbnail_id', true );
 	}
+}
+function _excerpt_sample(){
+	return __( 'Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi consequatur quibusdam deserunt sapiente eum repellat amet vel et officiis? Laboriosam optio debitis, laborum provident accusamus est harum dignissimos quos officia? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi consequatur quibusdam deserunt sapiente eum repellat amet vel et officiis? Laboriosam optio debitis, laborum provident accusamus est harum dignissimos quos officia? Lorem ipsum dolor sit amet, consectetur adipisicing elit. Sequi consequatur quibusdam deserunt sapiente eum repellat amet vel et officiis? Laboriosam optio debitis, laborum provident accusamus est harum dignissimos quos officia?');
 }
 
 function get_allowed_taxonomies(){
@@ -112,89 +68,6 @@ function get_allowed_taxonomies(){
 
 	return $taxes;
 }
-function get_widget_categories( $instance, $widget ){
-
-		// if( empty( $instance['tax_term'] ) ) {
-		// 	return array();
-		// }
-
-		$_include_taxonomies = array();
-		//$_include_ids = array();
-		$_exclude_ids = array();
-
-		// foreach( $instance['tax_term'] as $taxonomy => $term_ids ) {
-		// 	$_include_taxonomies[] = $taxonomy;
-		// 	array_walk_recursive( $term_ids, function( $value, $key ) use ( &$_include_ids ) {
-		// 		$_include_ids[$key] = $value;
-		// 	} );
-		// }
-
-		$r = array(
-			'taxonomy'   => $instance['tax'],
-			'orderby'    => $instance['orderby'],
-			'order'      => $instance['order'] ? $instance['order'] : '',
-			'hide_empty' => 0,
-			//'include'    => $_include_ids
-		);
-
-		$categories = get_terms( $r );
-
-		if ( is_wp_error( $categories ) ) {
-			$categories = array();
-		} else {
-			$categories = (array) $categories;
-		}
-
-		return $categories;
-}
-function get_widget_categories_hierarchy( $instance, $widget ){
-
-	// if( empty( $instance['tax_term'] ) ) {
-	// 	return array();
-	// }
-
-	$_exclude_taxonomies = array();
-	$_include_taxonomies = array();
-	$_include_ids = array();
-
-	// foreach( $instance['tax_term'] as $taxonomy => $term_ids ) {
-	// 	$_include_taxonomies[] = $taxonomy;
-	// 	array_walk_recursive( $term_ids, function( $value, $key ) use ( &$_include_ids ) {
-	// 		$_include_ids[$key] = $value;
-	// 	} );
-	// }
-
-	$r = array(
-		'taxonomy'   => $instance['tax'],
-		'orderby'    => $instance['orderby'],
-		'order'      => $instance['order'],
-		'hide_empty' => 0,
-		'include'    => $_include_ids,
-		'parent'     => 0,
-	);
-
-	$categories = get_terms( $r );
-
-	if ( is_wp_error( $categories ) ) {
-		$categories = array();
-	} else {
-		foreach ($categories as &$category) {
-
-			$r['parent'] = $category->term_id;
-			$sub_categories = get_terms( $r );
-
-			if ( is_wp_error( $sub_categories ) ){
-				$category->childs = array();
-			} else {
-				$category->childs = (array) $sub_categories;
-			}
-
-		}
-	}
-
-	return $categories;
-}
-
 
 function get_allowed_image_sizes( $fields = 'name' ){
 	global $_wp_additional_image_sizes;
@@ -287,17 +160,17 @@ function _taxanomies_list(){
 			$all_taxes[$key] = __(ucfirst($value), 'advanced-categories-widget');
 	}
 
-	return sanitize_select_array( $all_taxes );
+	return \SQUERY\sanitize_select_array( $all_taxes );
 }
 
-function _orderby_list(){
+function _orderby_term_list(){
 	$_orderby = array(
 		''           => __( 'Term ID', 'advanced-categories-widget'),
 		'name'       => __( 'Category Name', 'advanced-categories-widget' ),
 		'count'      => __( 'Post Count', 'advanced-categories-widget' ),
 		);
 
-	$params = sanitize_select_array( $_orderby, false );
+	$params = \SQUERY\sanitize_select_array( $_orderby, false );
 
 	return $params;
 }
