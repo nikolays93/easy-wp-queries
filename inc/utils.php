@@ -98,7 +98,7 @@ function get_terms_hierarchy( $instance, $widget ){
 		'parent'     => 0,
 	);
 
-	$categories = get_terms( $r );
+	$categories = \get_terms( $r );
 
 	if ( is_wp_error( $categories ) ) {
 		$categories = array();
@@ -106,7 +106,7 @@ function get_terms_hierarchy( $instance, $widget ){
 		foreach ($categories as &$category) {
 
 			$r['parent'] = $category->term_id;
-			$sub_categories = get_terms( $r );
+			$sub_categories = \get_terms( $r );
 
 			if ( is_wp_error( $sub_categories ) ){
 				$category->childs = array();

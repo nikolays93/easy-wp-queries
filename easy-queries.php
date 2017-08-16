@@ -4,7 +4,7 @@
 Plugin Name: Simple WordPress Queries
 Description:
 Plugin URI: http://#
-Version: 1.2.0
+Version: 1.2.1
 Author: NikolayS93
 Author URI: https://vk.com/nikolays_93
 Author EMAIL: nikolayS93@ya.ru

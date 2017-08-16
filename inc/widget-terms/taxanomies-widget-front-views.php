@@ -2,14 +2,14 @@
 namespace SQUERY\Widget_Terms;
 
 function get_item_id( $term = 0, $instance = array() ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	return sanitize_html_class( $instance['widget_id'] . '-term-' . $term->term_id );
 }
 
 function check_active_class( $term = 0, $instance = array() ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	$_current = get_queried_object();
@@ -38,7 +38,7 @@ function check_active_class( $term = 0, $instance = array() ){
 }
 
 function get_item_class( $term = 0, $instance = array() ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	$_classes = array();
@@ -62,7 +62,7 @@ function get_item_class( $term = 0, $instance = array() ){
 }
 
 function get_term_thumbnail( $term = 0, $instance = array() ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	add_filter('acatw_thumb_meta_field', 'is_woocommerce_thumb_meta_field', 10, 3);
@@ -125,7 +125,7 @@ function get_term_thumbnail( $term = 0, $instance = array() ){
 }
 
 function get_term_excerpt( $term = 0, $instance = array(), $trim = 'words' ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	$_text = $term->description;
@@ -155,7 +155,7 @@ function get_term_excerpt( $term = 0, $instance = array(), $trim = 'words' ){
 }
 
 function item_thumb_div( $term = 0, $instance = array(), $echo = true ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	$_html = '';
@@ -192,7 +192,7 @@ function item_thumb_div( $term = 0, $instance = array(), $echo = true ){
 }
 
 function term_post_count( $term = 0, $instance = array(), $echo = true ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	/* translators: 1: Number of posts 2: post type name */
@@ -228,7 +228,7 @@ function start_list( $instance, $categories, $echo = true ){
 }
 
 function start_list_item( $term, $instance, $categories, $echo = true ){
-	if( ! instance_of($term, 'WP_Term') )
+	if( ! $term instanceof WP_Term )
 		return '';
 
 	$html = sprintf( '<%1$s id="%2$s" class="%3$s">',

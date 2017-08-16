@@ -53,9 +53,9 @@ class Widget extends \WP_Widget
 		$is_hierarchical           = $instance['hierarchy'];
 
 		if( $is_hierarchical )
-			$categories = get_terms_hierarchy( $instance, $this );
+			$categories = \SQUERY\get_terms_hierarchy( $instance, $this );
 		else
-			$categories = get_terms( $instance, $this );
+			$categories = \SQUERY\get_terms( $instance, $this );
 
 		// widget title
 		$_title = sizeof($categories >= 1) ? apply_filters( 'widget_title', $instance['title'], $instance, $this->id_base ) : '';
