@@ -4,7 +4,7 @@
 Plugin Name: Simple WordPress Queries Shortcode
 Description: Add Query shortcode
 Plugin URI: http://#
-Version: 1.1 alpha
+Version: 1.2 alpha
 Author: NikolayS93
 Author URI: https://vk.com/nikolays_93
 Author EMAIL: nikolayS93@ya.ru

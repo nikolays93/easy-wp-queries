@@ -6,51 +6,15 @@ class SimpleWPQuery {
     add_shortcode('query', array($this, 'queries'));
   }
 
-  function get_top_sales_args($type, $max, $order, $view_type=false){
-    switch ($view_type) {
-      case 'personal':
-      $meta_q = array(
-        'key' => 'top_sale_product',
-        'value' => 'yes',
-        'compare' => '='
-        );
-        break;
-      case 'sales':
-      $meta_q = array(
-        'key' => 'total_sales',
-        'value' => 0,
-        'compare' => '>'
-        );
-        break;
-      case 'views':
-      $meta_q = array(
-        'key' => 'total_views',
-        'value' => 0,
-        'compare' => '>'
-        );
-        break;
-    }
-
-    $args = array(
-      'post_type' => $type,
-      'posts_per_page' => $max,
-      'meta_key' => 'total_sales',
-      'orderby' => 'meta_value_num',
-      'order' => $order,
-      'meta_query' => array($meta_q)
-      );
-
-    return $args;
-  }
   function get_query_template($template, $slug=false, $template_args = array()){
     extract($template_args);
 
-    if($slug == 'product'){
+    if( $post_type == 'product' ) {
       $templates[] = 'woocommerce/content-'.$slug.'-query.php';
       $templates[] = 'woocommerce/content-'.$slug.'.php';
     }
 
-    if($slug){
+    if( $slug ) {
       $templates[] = $template.'-'.$slug.'-query.php';
       $templates[] = $template.'-'.$slug.'.php';
     }
@@ -70,20 +34,31 @@ class SimpleWPQuery {
       echo "</pre>";
     }
   }
-  function get_container($part=false, $class = 'container-fluid', $tag = 'div'){
+  function get_container($part=false, $class = 'container-fluid', $tag = 'div', $post_type = false){
     $result = "";
 
-    if($class){
+    if( $class ) {
       $class .= " custom-query";
-      if($part=="start"){
-        $result.= "<{$tag} class='{$class}'>";
-        if($class=='container' || $class=='container-fluid' )
-          $result.= '<div class="row">';
+
+      if( $post_type == 'product' ) {
+        $tag = 'ul';
+        $class .= ' products';
       }
-      if($part=='end'){
-        if($class=='container' || $class=='container-fluid' )
+
+      if( $part == "start" ) {
+        if( $post_type == 'product' ) $result.= '<section class="woocommerce">';
+        $result.= "<{$tag} class='{$class}'>";
+        if( strpos($class, 'container') !== false || strpos($class, 'container-fluid') !== false ) {
+          $result.= '<div class="row">';
+        }
+      }
+
+      if( $part == 'end' ) {
+        if( strpos($class, 'container') !== false || strpos($class, 'container-fluid') !== false ) {
           $result.= '</div><!-- .row -->';
+        }
         $result.= "</{$tag}><!-- .{$class} -->";
+        if( $post_type == 'product' ) $result.= '</section>';
       }
     }
     return $result;
@@ -125,7 +100,7 @@ class SimpleWPQuery {
       case 'false': $container = false; break;
     }
 
-    $args = array(
+    $args = apply_filters('easy_queries_args', array(
       'p' => $id,
       'cat'=> $cat,
       'post_type' => $type,
@@ -135,7 +110,7 @@ class SimpleWPQuery {
       'order' => $order,
       'orderby' => $orderby,
       'post_status' => $status,
-      );
+      ) );
 
     if( $terms ){
       if( ! $tax ){
@@ -152,16 +127,9 @@ class SimpleWPQuery {
       }
     }
 
-    if( $type == 'top-sales'){
-      $options = get_option( DT_PLUGIN_NAME );
-      if( isset($options['bestsellers'])){
-        $type = 'product';
-        $args = $this->get_top_sales_args($type, $max, $order, $options['bestsellers']);
-      }
+    if( ! $template ) {
+      $template = ($args['post_type'] != 'post') ? $args['post_type'] : '';
     }
-
-    if(!$template)
-        $template = ($type != 'post') ? $type : '';
 
     $query = new WP_Query($args);
 
@@ -174,14 +142,15 @@ class SimpleWPQuery {
     // шаблон
     ob_start();
     if ( $query->have_posts() ) {
-      echo $this->get_container('start', $container, $wrap_tag);
+      echo $this->get_container('start', $container, $wrap_tag, $args['post_type']);
       while ( $query->have_posts() ) {
         $query->the_post();
 
         $options = get_option( SimpleWPQuery_Plugin::SETTINGS_NAME );
         $tempalte_dir = ( !empty($options['template_dir']) ) ? $options['template_dir'] : 'template-parts';
 
-        $this->get_query_template($tempalte_dir.'/content', $template, array(
+        $this->get_query_template( $tempalte_dir . '/content', $template, array(
+          'post_type' => $args['post_type'],
           'query'   => $args,
           'columns' => $columns,
           ));
