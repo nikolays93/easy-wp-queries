@@ -10,14 +10,12 @@
  * @filter 'custom_queries_args'
  *         @var $args
  *         @description change args after parse ( ex. type = bestsellers )
+ * @filter custom_query_template_dir
+ *         @var 'tempalte-parts'
+ *         @description directory folder name for search templates
  */
 class SimpleWPQuery {
     protected static $tmp;
-
-    function __construct()
-    {
-        add_shortcode('query', array($this, 'queries'));
-    }
 
     protected static function get_default_args()
     {
@@ -202,7 +200,7 @@ class SimpleWPQuery {
                 $query->the_post();
 
                 $options = get_option( SimpleWPQuery_Plugin::SETTINGS_NAME );
-                $tempalte_dir = ( !empty($options['template_dir']) ) ? $options['template_dir'] : 'template-parts';
+                $tempalte_dir = apply_filters( 'custom_query_template_dir', 'template-parts' );
 
                 self::search_query_template( $tempalte_dir . '/content', $template, array(
                   'post_type' => $args['post_type'],
@@ -255,4 +253,3 @@ class SimpleWPQuery {
         }
     }
 }
-new SimpleWPQuery();

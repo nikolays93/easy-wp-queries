@@ -19,89 +19,53 @@ define('SQUERY_DIR', rtrim(plugin_dir_path( __FILE__ ), '/') );
 
 class SimpleWPQuery_Plugin {
     const SETTINGS_NAME = 'SWPQ';
+    const SHORTCODE = 'query';
 
-    private function __clone() {}
-    private function __wakeup() {}
     private function __construct() {}
-    private static $instance = null;
 
-    public static function get_instance()
+    static function init()
     {
-        if ( ! isset( self::$instance ) ) {
-            self::$instance = new self;
-        }
-
-        return self::$instance;
-    }
-
-    public function init()
-    {
-        add_action( 'admin_init', array( $this, 'init_mce_plugin' ), 20 );
+        add_action( 'admin_init', array( __CLASS__, 'init_mce_plugin' ), 20 );
 
         require SQUERY_DIR . '/inc/queries.php';
+        add_shortcode( self::SHORTCODE, array('SimpleWPQuery', 'queries') );
     }
 
-    public function init_mce_plugin()
+    static function init_mce_plugin()
     {
         /** MCE Editor */
         if ( !current_user_can('edit_posts') && !current_user_can('edit_pages') ) {
             return;
         }
 
-        add_action('wp_ajax_update_squery_settings', array($this, 'ajax_update_settings'));
+        add_action('wp_ajax_update_squery_settings', array(__CLASS__, 'ajax_update_settings'));
 
         // foreach ( array('post.php','post-new.php') as $hook ) {
-        //  add_action( "admin_head-$hook", array($this, 'mce_variables') );
+        //  add_action( "admin_head-$hook", array(__CLASS__, 'mce_variables') );
         // }
 
-        add_action('admin_head', array( $this, 'add_mce_script' ));
+        add_action('admin_head', array( __CLASS__, 'add_mce_script' ));
 
-        add_filter("mce_external_plugins", array($this, 'mce_plugin'));
-        add_filter("mce_buttons", array($this, 'mce_button'));
-    }
-
-    /**
-     * @todo: Подумать, возможно правильнее перевести настройку папки в add_filter
-     */
-    function ajax_update_settings()
-    {
-        if( ! wp_verify_nonce( $_POST['security'], __CLASS__ ) ) {
-            wp_die('Ошибка! нарушены правила безопасности');
-        }
-
-        if( ! isset($_POST['template_dir']) ) {
-            wp_die('Данные не переданны');
-        }
-
-        $dir = get_template_directory() . '/' . sanitize_text_field( $_POST['template_dir'] );
-        if( ! is_dir($dir) ) {
-            wp_die('Нет доступа к указаной папке в активной теме (' . $dir . ')');
-        }
-
-        $update = update_option( self::SETTINGS_NAME, array('template_dir' => $_POST['template_dir']) );
-        if( $update ) {
-            echo "1";
-        }
-
-        wp_die();
+        add_filter("mce_external_plugins", array(__CLASS__, 'mce_plugin'));
+        add_filter("mce_buttons", array(__CLASS__, 'mce_button'));
     }
 
     /** Register Shortcode Button MCE */
-    function mce_plugin($plugin_array)
+    static function mce_plugin($plugin_array)
     {
         $plugin_array['query_shortcode'] = plugins_url( 'js/query_button.js', __FILE__ );
 
         return $plugin_array;
     }
 
-    function mce_button($buttons)
+    static function mce_button($buttons)
     {
         $buttons[] = 'query_shortcode';
 
         return $buttons;
     }
 
-    function add_mce_script()
+    static function add_mce_script()
     {
         if ( ! isset( get_current_screen()->id ) || get_current_screen()->base != 'post' ) {
             return;
@@ -110,27 +74,115 @@ class SimpleWPQuery_Plugin {
         $req = array( 'shortcode', 'wp-util', 'jquery' );
         wp_enqueue_script( 'query-sc', plugins_url( 'js/query_shortcode.js', __FILE__ ), $req, false, true );
 
-        $options = get_option( self::SETTINGS_NAME );
-        $post_types = get_post_types( array('public' => true) );
-        $types = array();
-
-        foreach ($post_types as $value => $text) {
-            $types[] = (object) array('value' => $value, 'text' => $text);
-        }
-
-        wp_localize_script('query-sc', 'queryMCEVar',
+        wp_localize_script( 'query-sc',
+            'custom_query_settings',
             array(
-                'postTypes' => $types,
-                'security' => wp_create_nonce( __CLASS__ ),
-                'template' => isset($options['template_dir']) ? $options['template_dir'] : '',
-                )
-            );
+                'shortcode' => self::SHORTCODE,
+                'types'     => self::get_post_type_list(),
+                'statuses'  => self::get_status_list(),
+                'orderby'   => self::get_order_by_list(),
+                ) );
     }
 
-    static public function activate(){ add_option( self::SETTINGS_NAME, array('template_dir' => '') ); }
-    static public function uninstall(){ delete_option( self::SETTINGS_NAME ); }
+    static function get_post_type_list()
+    {
+        $post_types = get_post_types( array('public' => true) );
+        $types = array();
+        foreach ($post_types as $value => $text) {
+            $types[] = (object) array('value' => $value, 'text' => __( ucfirst($text) ) );
+        }
+
+        return $types;
+    }
+
+    static function get_status_list()
+    {
+        $statuses = array(
+            (object) array(
+                'text' => __( 'Published' ),
+                'value' => 'publish'
+                ),
+            (object) array(
+                'text' => __( 'Scheduled' ),
+                'value' => 'future'
+                ),
+            (object) array(
+                'text' => __( 'За все время' ),
+                'value' => 'alltime'
+                ),
+            (object) array(
+                'text' => __( 'Any' ),
+                'value' => 'any',
+                ),
+            );
+
+        return $statuses;
+    }
+
+    static function get_order_by_list()
+    {
+        $order_by = array(
+            (object) array(
+                'text' => __( 'None' ),
+                'value' => 'none'
+                ),
+            (object) array(
+                'text' => __('ID'),
+                'value' => 'ID'
+                ),
+            (object) array(
+                'text' => __('Author'),
+                'value' => 'author'
+                ),
+            (object) array(
+                'text' => __('Title'),
+                'value' => 'title'
+                ),
+            (object) array(
+                'text' => __('Name'),
+                'value' => 'name'
+                ),
+            (object) array(
+                'text' => __('Type'),
+                'value' => 'type'
+                ),
+            (object) array(
+                'text' => __('Date'),
+                'value' => 'date'
+                ),
+            (object) array(
+                'text' => __('Modified'),
+                'value' => 'modified'
+                ),
+            (object) array(
+                'text' => __('Parent'),
+                'value' => 'parent'
+                ),
+            (object) array(
+                'text' => __('Random'),
+                'value' => 'rand'
+                ),
+            (object) array(
+                'text' => __('Comment'),
+                'value' => 'comment_count'
+                ),
+            (object) array(
+                'text' => __('Relevance'),
+                'value' => 'relevance'
+                ),
+            (object) array(
+                'text' => __('Menu'),
+                'value' => 'menu_order date'
+                ),
+            // {text: 'meta_value', value: 'meta_value'},
+            // {text: 'meta_value_num', value: 'meta_value_num'},
+            // {text: 'post__in', value: 'post__in'},
+            // {text: 'post_name__in', value: 'post_name__in'},
+            // {text: 'post_parent__in', value: 'post_parent__in'}
+            );
+
+        return $order_by;
+    }
 }
 
-add_action( 'plugins_loaded', function(){ SimpleWPQuery_Plugin::get_instance()->init(); });
-register_activation_hook( __FILE__, array( 'SimpleWPQuery_Plugin', 'activate' ) );
-register_uninstall_hook( __FILE__, array( 'SimpleWPQuery_Plugin', 'uninstall' ) );
+add_action( 'plugins_loaded', array('SimpleWPQuery_Plugin', 'init') );
