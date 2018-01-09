@@ -1,6 +1,8 @@
 <?php
 
 /**
+ * @todo : clear waste;
+ *
  * @filter 'custom_query_defaults'
  *         @var $defaults
  *         @description set defaults
@@ -41,21 +43,27 @@ class SimpleWPQuery {
         return apply_filters( 'custom_query_defaults', $defaults );
     }
 
-    protected static function search_query_template( $template, $slug=false, $template_args = array() )
+    protected static function search_query_template( $template, $slug=false, $template_args = array(), $check_q = true )
     {
         extract($template_args);
 
         if( $post_type == 'product' ) {
-            $templates[] = 'woocommerce/content-'.$slug.'-query.php';
+            if( $check_q )
+                $templates[] = 'woocommerce/content-'.$slug.'-query.php';
+
             $templates[] = 'woocommerce/content-'.$slug.'.php';
         }
 
         if( $slug ) {
-            $templates[] = $template.'-'.$slug.'-query.php';
+            if( $check_q )
+                $templates[] = $template.'-'.$slug.'-query.php';
+
             $templates[] = $template.'-'.$slug.'.php';
         }
 
-        $templates[] = $template.'-query.php';
+        if( $check_q )
+            $templates[] = $template.'-query.php';
+
         $templates[] = $template.'.php';
 
         if($req = locate_template($templates)) {
@@ -176,7 +184,11 @@ class SimpleWPQuery {
             }
         }
 
-        if( ! $template && 'post' !== $args['post_type'] ) {
+        $check_q = true;
+        if( $template ) {
+            $check_q = false;
+        }
+        elseif( 'post' !== $args['post_type'] ) {
             $template = $args['post_type'];
         }
 
@@ -206,7 +218,7 @@ class SimpleWPQuery {
                   'post_type' => $args['post_type'],
                   'query'   => $args,
                   'columns' => $columns,
-                  ) );
+                  ), $check_q );
             }
 
             echo self::set_container('end', $container, $wrap_tag, $args['post_type']);
