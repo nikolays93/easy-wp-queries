@@ -88,7 +88,7 @@ class SimpleWPQuery {
             return $result;
         }
 
-        $classes[] = $result;
+        $classes[] = $class;
         $classes[] = apply_filters( 'custom_query_class', "custom-query" );
 
         if( 'product' === $post_type ) {
@@ -194,7 +194,7 @@ class SimpleWPQuery {
 
         $query = new WP_Query($args);
 
-        if( $max > 1 ) {
+        if( $max != 1 ) {
             self::set_query_variables('is_singular', '');
         }
 
